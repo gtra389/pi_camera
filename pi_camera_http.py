@@ -1,9 +1,11 @@
 import io
 import picamera
 import logging
-import socketserver
+import SocketServer
 from threading import Condition
-from http import server
+# from http import server
+import BaseHTTPServer
+from BaseHTTPServer import BaseHTTPRequestHandler
 
 PAGE="""\
 <html>
@@ -16,6 +18,8 @@ PAGE="""\
 </body>
 </html>
 """
+
+print("Start....")
 
 class StreamingOutput(object):
     def __init__(self):
@@ -34,7 +38,7 @@ class StreamingOutput(object):
             self.buffer.seek(0)
         return self.buffer.write(buf)
 
-class StreamingHandler(server.BaseHTTPRequestHandler):
+class StreamingHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/':
             self.send_response(301)
@@ -73,7 +77,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_error(404)
             self.end_headers()
 
-class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
+class StreamingServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
 
